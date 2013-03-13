@@ -2,13 +2,13 @@
 chrome.tabs.onActivated.addListener(function(activeInfo) {
 	chrome.tabs.getSelected(null, function(tab) {
         var tabUrl = tab.url;
-        send(localStorage['exttype'] + "|" + tabUrl);
+        sendURL(tabUrl);
 	});
 });
 
 chrome.tabs.onUpdated.addListener(function(tabID, changeInfo, tab) {
   if (changeInfo.hasOwnProperty('url'))
-    send(localStorage['exttype'] + "|" + changeInfo['url']);
+    sendURL(changeInfo['url']);
 });
 
 function getHost(href) {
@@ -22,13 +22,13 @@ var socket = null;
 var WEBSCK_ADDY = "ws://"+localStorage["server_url"]+":8081/test";
 var blacklist = ['chrome-extension://', 'newtab', 'chrome-devtools://', 'chrome://'];
 
-function send(val) {
+function sendURL(url) {
   if (!socket) {console.log('Not connected'); return;}
   for (i in blacklist)
       if (url.indexOf(blacklist[i]) != -1)
         return;
-  socket.send(val);
-  console.log('> ' + val);
+  socket.send(localStorage['exttype'] + "|" + url);
+  console.log('> ' + localStorage['exttype'] + "|" + url);
 }
 
 function connect() {
