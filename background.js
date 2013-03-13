@@ -13,7 +13,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 //--------------------- WEBSOCKETS -----------------------
 var socket = null;
-var WEBSCK_ADDY = "ws://localhost:8081/test";
+var WEBSCK_ADDY = "ws://"+localStorage["server_url"]+":8081/test";
 
 function send(val) {
   if (!socket) {console.log('Not connected'); return;}
