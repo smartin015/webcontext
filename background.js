@@ -20,14 +20,17 @@ function getHost(href) {
 //--------------------- WEBSOCKETS -----------------------
 var socket = null;
 var WEBSCK_ADDY = "ws://"+localStorage["server_url"]+":8081/test";
+var blacklist = ['chrome-extension://', 'newtab', 'chrome-devtools://', 'chrome://'];
 
 function send(val) {
   if (!socket) {console.log('Not connected'); return;}
+  for (i in blacklist)
+      if (url.indexOf(blacklist[i]) != -1)
+        return;
   socket.send(val);
   console.log('> ' + val);
 }
 
-var blacklist = ['chrome-extension', 'newtab'];
 function connect() {
   if ('WebSocket' in window) {
     socket = new WebSocket(WEBSCK_ADDY);
