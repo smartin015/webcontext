@@ -1,8 +1,3 @@
-// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.executeScript(
-      null, {code:"document.body.style.background='red !important'"});
-});
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
 	chrome.tabs.getSelected(null, function(tab) {
@@ -10,6 +5,17 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         send(localStorage['exttype'] + "|" + tabUrl);
 	});
 });
+
+chrome.tabs.onUpdated.addListener(function(tabID, changeInfo, tab) {
+  if (changeInfo.hasOwnProperty('url'))
+    send(localStorage['exttype'] + "|" + changeInfo['url']);
+});
+
+function getHost(href) {
+  var l = document.createElement("a");
+  l.href = href;
+  return l.hostname;
+}
 
 //--------------------- WEBSOCKETS -----------------------
 var socket = null;
@@ -21,6 +27,7 @@ function send(val) {
   console.log('> ' + val);
 }
 
+var blacklist = ['chrome-extension', 'newtab'];
 function connect() {
   if ('WebSocket' in window) {
     socket = new WebSocket(WEBSCK_ADDY);
@@ -35,6 +42,26 @@ function connect() {
   };
   socket.onmessage = function (event) {
     console.log(event.data);
+    if (localStorage["exttype"] == "server")
+      return;
+    
+    var url = decodeURIComponent(event.data);
+    
+    //Skip erroneous requests to snap to chrome extension stuff
+    for (i in blacklist)
+      if (url.indexOf(blacklist[i]) != -1)
+        return;
+      
+    var querystr =  "*://"+getHost(url)+"/*";
+    console.log("Searching for " + querystr);
+    chrome.tabs.query({"url": querystr}, function (matchtabs) {
+      if (matchtabs.length > 0) {
+        chrome.tabs.move(matchtabs[0].id, {'index': 0});
+        chrome.tabs.update(matchtabs[0].id, {'active': true});
+      }
+      else
+        chrome.tabs.create({url: decodeURIComponent(event.data)});
+    });
   };
   socket.onerror = function () {
     console.log('Error');
