@@ -1,0 +1,13 @@
+{
+  "name": "Contextual Web",
+  "version": "0.5",
+  "description": "Monitors one browser window and contextually opens pages on other windows of other computers",
+  "permissions": ["history", "tabs","http://*/*"],
+  "options_page": "options.html",
+  "background": { "scripts": ["background.js"] },
+  "browser_action": {
+    "default_popup": "dropdown.html",
+    "default_icon": "clock.png"
+  },
+  "manifest_version": 2
+}
