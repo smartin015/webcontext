@@ -55,7 +55,7 @@ function connect() {
       if (url.indexOf(blacklist[i]) != -1)
         return;
       
-    var querystr =  "*://"+getHost(url)+"/*";
+    var querystr =  url.split("?")[0] + "*";
     console.log("Searching for " + querystr);
     chrome.tabs.query({"url": querystr}, function (matchtabs) {
       if (matchtabs.length > 0) {
