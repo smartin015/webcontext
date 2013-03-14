@@ -86,6 +86,9 @@ function connect() {
       logMessage += 'CloseEvent is not available';
     }
     console.log(logMessage + ')');
+    
+    //Attempt to reconnect
+    window.setTimeout(websocket_init, 5000);
   };
 }
 
